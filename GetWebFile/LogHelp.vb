@@ -11,15 +11,18 @@ Public Class LogHelp
         End Set
     End Property
 
+    'Private Lockobject As Object
+    Private threadLock As Object = New Object()
+
     Public Sub New(ByVal logPath As String)
         _LogPath = logPath
         If Not IO.Directory.Exists(logPath) Then IO.Directory.CreateDirectory(logPath)
 
     End Sub
     Public Sub writeLog(ByVal text As String)
-        Try
+        SyncLock threadLock
             File.AppendAllText(Path.Combine(LogPath, "loginfo.txt"), text, System.Text.Encoding.UTF8)
-        Catch ex As Exception
-        End Try
+        End SyncLock
+
     End Sub
 End Class

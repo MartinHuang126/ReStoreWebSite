@@ -32,6 +32,7 @@ Partial Class SEOLinksFrm
         Me.rdo_current = New System.Windows.Forms.RadioButton()
         Me.rdo_allFolder = New System.Windows.Forms.RadioButton()
         Me.btn_addTag = New System.Windows.Forms.Button()
+        Me.rdo_index = New System.Windows.Forms.RadioButton()
         Me.SuspendLayout()
         '
         'btn_choose
@@ -92,22 +93,20 @@ Partial Class SEOLinksFrm
         'rdo_current
         '
         Me.rdo_current.AutoSize = True
-        Me.rdo_current.Location = New System.Drawing.Point(283, 56)
+        Me.rdo_current.Location = New System.Drawing.Point(266, 56)
         Me.rdo_current.Name = "rdo_current"
         Me.rdo_current.Size = New System.Drawing.Size(91, 17)
         Me.rdo_current.TabIndex = 8
-        Me.rdo_current.TabStop = True
         Me.rdo_current.Text = "Current Folder"
         Me.rdo_current.UseVisualStyleBackColor = True
         '
         'rdo_allFolder
         '
         Me.rdo_allFolder.AutoSize = True
-        Me.rdo_allFolder.Location = New System.Drawing.Point(413, 56)
+        Me.rdo_allFolder.Location = New System.Drawing.Point(363, 56)
         Me.rdo_allFolder.Name = "rdo_allFolder"
         Me.rdo_allFolder.Size = New System.Drawing.Size(134, 17)
         Me.rdo_allFolder.TabIndex = 9
-        Me.rdo_allFolder.TabStop = True
         Me.rdo_allFolder.Text = "Current and Sub Folder"
         Me.rdo_allFolder.UseVisualStyleBackColor = True
         '
@@ -120,11 +119,24 @@ Partial Class SEOLinksFrm
         Me.btn_addTag.Text = "AddTag"
         Me.btn_addTag.UseVisualStyleBackColor = True
         '
+        'rdo_index
+        '
+        Me.rdo_index.AutoSize = True
+        Me.rdo_index.Checked = True
+        Me.rdo_index.Location = New System.Drawing.Point(503, 56)
+        Me.rdo_index.Name = "rdo_index"
+        Me.rdo_index.Size = New System.Drawing.Size(76, 17)
+        Me.rdo_index.TabIndex = 11
+        Me.rdo_index.TabStop = True
+        Me.rdo_index.Text = "IndexPage"
+        Me.rdo_index.UseVisualStyleBackColor = True
+        '
         'SEOLinksFrm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(800, 450)
+        Me.Controls.Add(Me.rdo_index)
         Me.Controls.Add(Me.btn_addTag)
         Me.Controls.Add(Me.rdo_allFolder)
         Me.Controls.Add(Me.rdo_current)
@@ -150,4 +162,5 @@ Partial Class SEOLinksFrm
     Friend WithEvents rdo_current As RadioButton
     Friend WithEvents rdo_allFolder As RadioButton
     Friend WithEvents btn_addTag As Button
+    Friend WithEvents rdo_index As RadioButton
 End Class

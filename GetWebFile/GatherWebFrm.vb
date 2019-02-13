@@ -40,7 +40,7 @@ Public Class GatherWebFrm
             completeList.Add(task.Urlmain, "Error")
             updateTxtComplete()
             'txt_Complete.AppendText("Error:" & task.Urlmain & vbCrLf)
-            th.Abort()
+            'th.Abort()
         End Try
 
     End Sub
@@ -71,8 +71,8 @@ Public Class GatherWebFrm
     End Sub
 
     Private Sub GatherWebFrm_FormClosed(sender As Object, e As FormClosedEventArgs) Handles MyBase.FormClosed
-        th.Abort()
         Dispose()
+        Application.ExitThread()
         Close()
     End Sub
 
@@ -81,7 +81,7 @@ Public Class GatherWebFrm
         level = NumericUpDown1.Value
         threadMaxCount = NumericUpDown2.Value
         For Each strWait As String In txt_Add.Text.Trim.Replace(vbCrLf, " ").Split(" ")
-            If strWait.StartsWith("http") AndAlso Not waitList.Contains(strWait.Trim) _
+            If strWait.StartsWith("http") AndAlso Not waitList.Contains(strWait.Trim) AndAlso strWait.IndexOf("/http") > 0 _
                 AndAlso Not doingList.Contains(strWait.Trim) AndAlso Not completeList.Keys.Contains(strWait.Trim) Then
                 waitList.Add(strWait.Trim)
             End If
@@ -130,12 +130,18 @@ Public Class GatherWebFrm
     End Sub
 
     Private Sub btn_retry_Click(sender As Object, e As EventArgs) Handles btn_retry.Click
+        Dim itemComplete As New List(Of String)
+
         For Each item As KeyValuePair(Of String, String) In completeList
             If item.Value.Equals("Error") Then
                 waitList.Add(item.Key)
-                completeList.Remove(item.Key)
+                itemComplete.Add(item.Key)
             End If
         Next
+        For Each item As String In itemComplete
+            completeList.Remove(item)
+        Next
+        itemComplete.Clear()
         updateTxtComplete()
     End Sub
 
