@@ -151,7 +151,7 @@ Public Class SEOLinksFrm
                 html = File.ReadAllText(filepath, GetEncoding(filepath))
                 html = reg.Replace(html, ReplaceStr)
                 'html = html.Replace(itemReplaceStr, ReplaceStr)
-                File.WriteAllText(filepath, html, encoding)
+                File.WriteAllText(filepath, html, System.Text.Encoding.UTF8)
             Next
             txt_replace.Text = "Complete!"
         Catch ex As Exception

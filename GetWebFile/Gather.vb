@@ -17,7 +17,7 @@ Public Class Gather
 
     Public postDoc As HtmlDocument()
     Public htmlNodeList As HtmlNodeCollection
-    Public client As WebClient
+    Public _encoding As Text.Encoding
 
     Public Delegate Sub WriteToText(ByVal text As String) '写全部log到窗体的委托
     Private writeToForm As WriteToText
@@ -55,8 +55,9 @@ Public Class Gather
 
     'Public Property Imgpath As String
 
-    Public Sub New(ByVal Url As String, ByVal filepath As String, level As Integer)
+    Public Sub New(ByVal Url As String, ByVal filepath As String, level As Integer, encoding As Text.Encoding)
         _Filepath = filepath
+        _encoding = encoding
         Urlmain = Url
         TatolLevel = level
         CurrentUrlList.Clear()
@@ -109,11 +110,10 @@ Public Class Gather
                 strHtml.Contains("Your generous donation will be matched 2-to-1 right now. Your $5 becomes $15!") Then
             Throw New Exception
         End If
-        strHtml = strHtml.Replace("https://web.archive.org", "") 'strHtml.Replace(UrlStart, "A_A_A_A")
-        'strHtml = strHtml.Replace(UrlStart.Substring(UrlStart.IndexOf("/web/")), UrlStart)
+        strHtml = strHtml.Replace("https://web.archive.org", "")
+
         strHtml = strHtml.Replace("/web/", "https://web.archive.org/web/")
-        'strHtml = strHtml.Replace("A_A_A_A", UrlStart)
-        'strHtml = strHtml.Replace(SiteName & ":80", SiteName)
+
         strHtml = strHtml.Replace("<fb:like action=""like"" show_faces=""false"" width=""140""></fb:like>", "")
 
         '获取页面所有链接放在UrlList
@@ -138,7 +138,7 @@ Public Class Gather
 
         End If
         strHtml = strHtml.Replace(":80", "").Replace(UrlEnd.TrimEnd("/"), "").Replace(UrlEnd.Replace("www.", ""), "").Replace(UrlEnd.Replace("//", "//www."), "")
-        strHtml = strHtml.Replace("https://web.archive.org", "").Replace("http://www.10times10.com", "").Replace("http://perso.wanadoo.fr","")
+        strHtml = strHtml.Replace("https://web.archive.org", "")
         Dim fileDirectory As String = fullpath.Substring(0, fullpath.LastIndexOf("/"))
         '下载首页
         If Not IO.Directory.Exists(fileDirectory) Then IO.Directory.CreateDirectory(fileDirectory)
@@ -149,7 +149,7 @@ Public Class Gather
                 Return
             End If
             SyncLock threadLock
-                File.WriteAllText(fullpath, strHtml, System.Text.Encoding.UTF8)
+                File.WriteAllText(fullpath, strHtml, _encoding)
             End SyncLock
         Catch ex As Exception
             writeMessage(DateTime.Now.ToString & " writeFileError: " & fullpath & " , url: " & url & vbCrLf)
@@ -162,7 +162,7 @@ Public Class Gather
 
         Dim level As Integer = 0
         Dim paraOption As New ParallelOptions
-        paraOption.MaxDegreeOfParallelism = 5
+        paraOption.MaxDegreeOfParallelism = 3
 
         While CurrentUrlList.Count > 0 AndAlso level <= TatolLevel
             writeToForm(DateTime.Now.ToString & " MainSite: " & Urlmain & " CurrentUrlList's count: " & CurrentUrlList.Count & "Level: " & level & vbCrLf)
@@ -239,6 +239,7 @@ Public Class Gather
 
             Parallel.ForEach(Of String)(CurrentUrlList, paraOption, Function(uri)
                                                                         'For Each uri In CurrentUrlList
+                                                                        writeMessage(DateTime.Now.ToString & " current url:" & uri & vbCrLf)
                                                                         Dim imgpath As String = String.Empty
                                                                         Dim indexend As Integer = 0
                                                                         Dim imgDirectory As String = String.Empty
@@ -255,9 +256,10 @@ Public Class Gather
                                                                         End If
 
                                                                         If regpdf.IsMatch(uri) OrElse regImg.IsMatch(uri) OrElse regJs.IsMatch(uri) OrElse regSwf.IsMatch(uri) OrElse regCss.IsMatch(uri) Then  '下载静态文件
-                                                                            uri = uri.Replace("amp;", "").Replace("%20", " ")
-                                                                            strFilePath = getFilePath(uri, imgpath, indexhttp, indexend, imgDirectory, imgName, phyimgDirectory)
                                                                             Try
+                                                                                uri = uri.Replace("amp;", "").Replace("%20", " ")
+                                                                                strFilePath = getFilePath(uri, imgpath, indexhttp, indexend, imgDirectory, imgName, phyimgDirectory)
+
                                                                                 If File.Exists(strFilePath) Then '跳过已存在文件，可以支持缺失文件从不同时间抓取
                                                                                     writeMessage(DateTime.Now.ToString & " jump a file: " & strFilePath & " URL: " & uri & vbCrLf)
                                                                                     Return Nothing
@@ -277,35 +279,36 @@ Public Class Gather
                                                                             End Try
 
                                                                         Else '下载跳转页面
-                                                                            Dim isContains = False '兼容问号后面带“.”的链接，也把它变为文件夹
-                                                                            uri = uri.Replace("amp;", "").Replace("%20", " ")
-                                                                            imgpath = uri.Substring(indexhttp).Replace(":80", "").Replace("perso.wanadoo.fr", SiteName) '特例二级域名改为主域名
-                                                                            If level <> 0 AndAlso Not uri.Contains("if_") Then
-                                                                                If imgpath.EndsWith(SiteName) OrElse imgpath.EndsWith(SiteName & "/") Then
+                                                                            Try
+                                                                                Dim isContains = False '兼容问号后面带“.”的链接，也把它变为文件夹
+                                                                                uri = uri.Replace("amp;", "").Replace("%20", " ")
+                                                                                imgpath = uri.Substring(indexhttp).Replace(":80", "").Replace("perso.wanadoo.fr", SiteName) '特例二级域名改为主域名
+                                                                                If level <> 0 AndAlso Not uri.Contains("if_") Then
+                                                                                    If imgpath.EndsWith(SiteName) OrElse imgpath.EndsWith(SiteName & "/") Then
+                                                                                        Return Nothing
+                                                                                    End If
+                                                                                End If
+                                                                                If imgpath.Contains("?") Then
+                                                                                    isContains = True
+                                                                                End If
+                                                                                imgpath = imgpath.Replace("?", "/").Replace("&", "/").Replace(":", "/").Replace("#", "") '带参数的url地址变成多重文件夹结构
+                                                                                If Not imgpath.Substring(imgpath.LastIndexOf("/")).Contains(".") OrElse isContains Then
+                                                                                    imgpath = imgpath.TrimEnd("/") & "/"
+                                                                                End If
+                                                                                indexend = imgpath.LastIndexOf("/")
+                                                                                If indexend < 0 Then
                                                                                     Return Nothing
                                                                                 End If
-                                                                            End If
-                                                                            If imgpath.Contains("?") Then
-                                                                                isContains = True
-                                                                            End If
-                                                                            imgpath = imgpath.Replace("?", "/").Replace("&", "/").Replace(":", "/").Replace("#", "") '带参数的url地址变成多重文件夹结构
-                                                                            If Not imgpath.Substring(imgpath.LastIndexOf("/")).Contains(".") OrElse isContains Then
-                                                                                imgpath = imgpath.TrimEnd("/") & "/"
-                                                                            End If
-                                                                            indexend = imgpath.LastIndexOf("/")
-                                                                            If indexend < 0 Then
-                                                                                Return Nothing
-                                                                            End If
-                                                                            imgDirectory = imgpath.Substring(0, indexend)
-                                                                            imgName = imgpath.Substring(indexend + 1).Split(".")(0)
-                                                                            If String.IsNullOrEmpty(imgName) Then
-                                                                                imgName = "index"
-                                                                            End If
-                                                                            imgDirectory = getStringWithNoillegal(imgDirectory)
-                                                                            phyimgDirectory = Filepath & "/" & imgDirectory
+                                                                                imgDirectory = imgpath.Substring(0, indexend)
+                                                                                imgName = imgpath.Substring(indexend + 1).Split(".")(0)
+                                                                                If String.IsNullOrEmpty(imgName) Then
+                                                                                    imgName = "index"
+                                                                                End If
+                                                                                imgDirectory = getStringWithNoillegal(imgDirectory)
+                                                                                phyimgDirectory = Filepath & "/" & imgDirectory
 
-                                                                            imgName = getStringWithNoillegal(imgName)
-                                                                            Try
+                                                                                imgName = getStringWithNoillegal(imgName)
+
                                                                                 DownloadFileForHtml(uri, phyimgDirectory.TrimEnd("/") & "/" & imgName & ".html")
 
                                                                             Catch ex As Exception
@@ -314,6 +317,7 @@ Public Class Gather
                                                                             End Try
 
                                                                         End If
+                                                                        Return Nothing
                                                                     End Function)
             CurrentUrlList.Clear()
             If NextUrlList.Count = 0 Then
@@ -326,11 +330,9 @@ Public Class Gather
     End Sub
 
     Private Sub DownloadStaticFile(uri As String, strFilePath As String)
-        SyncLock threadLock
-            client = New WebClient()
-            client.DownloadFile(uri, strFilePath)
-            client.Dispose()
-        End SyncLock
+        Dim client = New WebClient()
+        client.DownloadFile(uri, strFilePath)
+        client.Dispose()
     End Sub
 
     Private Sub addExisturlList(url As String)
@@ -368,11 +370,9 @@ Public Class Gather
         End If
         staticFileDirectory = getStringWithNoillegal(staticFileDirectory)
         staticFileName = getStringWithNoillegal(staticFileName)
-        If regpdf.IsMatch(Uri) Then
-            phyimgDirectory = Filepath & "/" & staticFileDirectory & "/" & staticFileName
-        Else
-            phyimgDirectory = Filepath & "/" & staticFileDirectory
-        End If
+
+        phyimgDirectory = Filepath & "/" & staticFileDirectory
+
 
         If Not IO.Directory.Exists(phyimgDirectory) Then IO.Directory.CreateDirectory(phyimgDirectory)
         Return Path.Combine(phyimgDirectory, staticFileName)
@@ -390,7 +390,7 @@ Public Class Gather
             If index > -1 Then
                 Return index
             End If
-            Return IIf(uri.IndexOf("10times10.com", 30) > -1, uri.IndexOf("10times10.com", 30), uri.IndexOf("perso.wanadoo.fr", 30))
+            'Return IIf(uri.IndexOf("10times10.com", 30) > -1, uri.IndexOf("10times10.com", 30), uri.IndexOf("perso.wanadoo.fr", 30))
         End If
         Return -1
     End Function
@@ -618,7 +618,7 @@ Public Class Gather
             getResponse(pageurl, request, response)
             resStream = response.GetResponseStream()
 
-            resStreamReader = New StreamReader(resStream, System.Text.Encoding.UTF8)
+            resStreamReader = New StreamReader(resStream, _encoding)
             resultSting = resStreamReader.ReadToEnd()
 
             Dim reg As New System.Text.RegularExpressions.Regex("<!-- BEGIN WAYBACK TOOLBAR INSERT -->(.|\n)*?<!-- END WAYBACK TOOLBAR INSERT -->")
@@ -653,7 +653,7 @@ Public Class Gather
 
         request.UseDefaultCredentials = True 'New NetworkCredential("reasonable", "190854$")
         '设置代理
-        request.Proxy = New WebProxy("115.151.1.103:9999", True)
+        ' request.Proxy = New WebProxy("115.151.1.103:9999", True)
         request.ServicePoint.Expect100Continue = False ';//加快载入速度
         request.ServicePoint.UseNagleAlgorithm = False ';//禁止Nagle算法加快载入速度
         request.AllowWriteStreamBuffering = False ';//禁止缓冲加快载入速度
@@ -662,7 +662,7 @@ Public Class Gather
         request.Timeout = 15000
         request.Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8"
         'request.Headers.Add("Accept-Encoding", "gzip, deflate, sdch")'导致请求回来的数据是乱码
-        request.Headers.Add("Accept-Language", "zh-cn,en-us;q=0.5")
+        request.Headers.Add("Accept-Language", "*")
         request.UserAgent = "Mozilla/5.0 (compatible;MSIE 9.0;Windows NT 6.1;WOW64;Trident/5.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.65 Safari/537.36"
         request.Method = "GET"
         'request.Headers.Add("Cookie", Cookie)

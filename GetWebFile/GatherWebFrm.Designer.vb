@@ -36,6 +36,8 @@ Partial Class GatherWebFrm
         Me.Label6 = New System.Windows.Forms.Label()
         Me.Label7 = New System.Windows.Forms.Label()
         Me.txt_Add = New System.Windows.Forms.TextBox()
+        Me.Label1 = New System.Windows.Forms.Label()
+        Me.cbo_encoding = New System.Windows.Forms.ComboBox()
         CType(Me.NumericUpDown1, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.NumericUpDown2, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
@@ -63,7 +65,7 @@ Partial Class GatherWebFrm
         'Label3
         '
         Me.Label3.AutoSize = True
-        Me.Label3.Location = New System.Drawing.Point(669, 109)
+        Me.Label3.Location = New System.Drawing.Point(669, 83)
         Me.Label3.Name = "Label3"
         Me.Label3.Size = New System.Drawing.Size(36, 13)
         Me.Label3.TabIndex = 5
@@ -71,7 +73,7 @@ Partial Class GatherWebFrm
         '
         'NumericUpDown1
         '
-        Me.NumericUpDown1.Location = New System.Drawing.Point(727, 107)
+        Me.NumericUpDown1.Location = New System.Drawing.Point(727, 83)
         Me.NumericUpDown1.Maximum = New Decimal(New Integer() {8, 0, 0, 0})
         Me.NumericUpDown1.Name = "NumericUpDown1"
         Me.NumericUpDown1.Size = New System.Drawing.Size(45, 20)
@@ -123,7 +125,7 @@ Partial Class GatherWebFrm
         'Label4
         '
         Me.Label4.AutoSize = True
-        Me.Label4.Location = New System.Drawing.Point(647, 48)
+        Me.Label4.Location = New System.Drawing.Point(647, 30)
         Me.Label4.Name = "Label4"
         Me.Label4.Size = New System.Drawing.Size(58, 13)
         Me.Label4.TabIndex = 11
@@ -131,7 +133,7 @@ Partial Class GatherWebFrm
         '
         'NumericUpDown2
         '
-        Me.NumericUpDown2.Location = New System.Drawing.Point(727, 46)
+        Me.NumericUpDown2.Location = New System.Drawing.Point(727, 30)
         Me.NumericUpDown2.Maximum = New Decimal(New Integer() {8, 0, 0, 0})
         Me.NumericUpDown2.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
         Me.NumericUpDown2.Name = "NumericUpDown2"
@@ -177,11 +179,34 @@ Partial Class GatherWebFrm
         Me.txt_Add.TabIndex = 16
         Me.txt_Add.WordWrap = False
         '
+        'Label1
+        '
+        Me.Label1.AutoSize = True
+        Me.Label1.Location = New System.Drawing.Point(650, 132)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(55, 13)
+        Me.Label1.TabIndex = 17
+        Me.Label1.Text = "Encoding:"
+        '
+        'cbo_encoding
+        '
+        Me.cbo_encoding.DisplayMember = "UTF-8"
+        Me.cbo_encoding.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cbo_encoding.FormattingEnabled = True
+        Me.cbo_encoding.Items.AddRange(New Object() {"UTF-8", "Default"})
+        Me.cbo_encoding.Location = New System.Drawing.Point(727, 132)
+        Me.cbo_encoding.Name = "cbo_encoding"
+        Me.cbo_encoding.Size = New System.Drawing.Size(121, 21)
+        Me.cbo_encoding.TabIndex = 18
+        Me.cbo_encoding.ValueMember = "1"
+        '
         'GatherWebFrm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(927, 615)
+        Me.Controls.Add(Me.cbo_encoding)
+        Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.txt_Add)
         Me.Controls.Add(Me.Label7)
         Me.Controls.Add(Me.Label6)
@@ -218,4 +243,6 @@ Partial Class GatherWebFrm
     Friend WithEvents Label7 As Label
     Friend WithEvents btn_Add As Button
     Friend WithEvents txt_Add As TextBox
+    Friend WithEvents Label1 As Label
+    Friend WithEvents cbo_encoding As ComboBox
 End Class

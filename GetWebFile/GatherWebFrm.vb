@@ -96,11 +96,16 @@ Public Class GatherWebFrm
     End Sub
 
     Private Sub startWork()
+        Dim encoding = System.Text.Encoding.UTF8
+        If (cbo_encoding.Text.Equals("Default")) Then
+            encoding = System.Text.Encoding.Default
+        End If
+
         While waitList.Count > 0 AndAlso doingList.Count < threadMaxCount
             doingList.Add(waitList(0))
             th = New Threading.Thread(New Threading.ParameterizedThreadStart(AddressOf excute))
             Try
-                th.Start(New Gather(waitList(0), filepath, level))
+                th.Start(New Gather(waitList(0), filepath, level, encoding))
             Catch ex As Exception
                 txt_Detail.AppendText(ex.Message & vbCrLf)
             End Try
