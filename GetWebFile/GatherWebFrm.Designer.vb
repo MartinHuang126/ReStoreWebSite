@@ -193,7 +193,7 @@ Partial Class GatherWebFrm
         Me.cbo_encoding.DisplayMember = "UTF-8"
         Me.cbo_encoding.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cbo_encoding.FormattingEnabled = True
-        Me.cbo_encoding.Items.AddRange(New Object() {"UTF-8", "Default"})
+        Me.cbo_encoding.Items.AddRange(New Object() {"UTF-8", "Default", "Unicode", "gb2312"})
         Me.cbo_encoding.Location = New System.Drawing.Point(727, 132)
         Me.cbo_encoding.Name = "cbo_encoding"
         Me.cbo_encoding.Size = New System.Drawing.Size(121, 21)

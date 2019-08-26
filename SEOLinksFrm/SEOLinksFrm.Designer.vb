@@ -33,6 +33,7 @@ Partial Class SEOLinksFrm
         Me.rdo_allFolder = New System.Windows.Forms.RadioButton()
         Me.btn_addTag = New System.Windows.Forms.Button()
         Me.rdo_index = New System.Windows.Forms.RadioButton()
+        Me.btn_CreateFolder = New System.Windows.Forms.Button()
         Me.SuspendLayout()
         '
         'btn_choose
@@ -49,7 +50,6 @@ Partial Class SEOLinksFrm
         '
         Me.txt_folderPath.Location = New System.Drawing.Point(33, 50)
         Me.txt_folderPath.Name = "txt_folderPath"
-        Me.txt_folderPath.ReadOnly = True
         Me.txt_folderPath.Size = New System.Drawing.Size(227, 20)
         Me.txt_folderPath.TabIndex = 1
         '
@@ -131,11 +131,21 @@ Partial Class SEOLinksFrm
         Me.rdo_index.Text = "IndexPage"
         Me.rdo_index.UseVisualStyleBackColor = True
         '
+        'btn_CreateFolder
+        '
+        Me.btn_CreateFolder.Location = New System.Drawing.Point(320, 13)
+        Me.btn_CreateFolder.Name = "btn_CreateFolder"
+        Me.btn_CreateFolder.Size = New System.Drawing.Size(75, 23)
+        Me.btn_CreateFolder.TabIndex = 12
+        Me.btn_CreateFolder.Text = "CreateFolder"
+        Me.btn_CreateFolder.UseVisualStyleBackColor = True
+        '
         'SEOLinksFrm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(800, 450)
+        Me.Controls.Add(Me.btn_CreateFolder)
         Me.Controls.Add(Me.rdo_index)
         Me.Controls.Add(Me.btn_addTag)
         Me.Controls.Add(Me.rdo_allFolder)
@@ -163,4 +173,5 @@ Partial Class SEOLinksFrm
     Friend WithEvents rdo_allFolder As RadioButton
     Friend WithEvents btn_addTag As Button
     Friend WithEvents rdo_index As RadioButton
+    Friend WithEvents btn_CreateFolder As Button
 End Class

@@ -17,7 +17,7 @@ Public Class Gather
 
     Public postDoc As HtmlDocument()
     Public htmlNodeList As HtmlNodeCollection
-    Public _encoding As Text.Encoding
+    Public _encoding As String
 
     Public Delegate Sub WriteToText(ByVal text As String) '写全部log到窗体的委托
     Private writeToForm As WriteToText
@@ -55,7 +55,7 @@ Public Class Gather
 
     'Public Property Imgpath As String
 
-    Public Sub New(ByVal Url As String, ByVal filepath As String, level As Integer, encoding As Text.Encoding)
+    Public Sub New(ByVal Url As String, ByVal filepath As String, level As Integer, encoding As String)
         _Filepath = filepath
         _encoding = encoding
         Urlmain = Url
@@ -149,7 +149,7 @@ Public Class Gather
                 Return
             End If
             SyncLock threadLock
-                File.WriteAllText(fullpath, strHtml, _encoding)
+                File.WriteAllText(fullpath, strHtml, System.Text.Encoding.UTF8)
             End SyncLock
         Catch ex As Exception
             writeMessage(DateTime.Now.ToString & " writeFileError: " & fullpath & " , url: " & url & vbCrLf)
@@ -618,7 +618,7 @@ Public Class Gather
             getResponse(pageurl, request, response)
             resStream = response.GetResponseStream()
 
-            resStreamReader = New StreamReader(resStream, _encoding)
+            resStreamReader = New StreamReader(resStream, Text.Encoding.GetEncoding(_encoding))
             resultSting = resStreamReader.ReadToEnd()
 
             Dim reg As New System.Text.RegularExpressions.Regex("<!-- BEGIN WAYBACK TOOLBAR INSERT -->(.|\n)*?<!-- END WAYBACK TOOLBAR INSERT -->")
@@ -651,7 +651,7 @@ Public Class Gather
     Private Shared Sub getResponse(pageurl As String, ByRef request As HttpWebRequest, ByRef response As WebResponse)
         request = HttpWebRequest.Create(pageurl)
 
-        request.UseDefaultCredentials = True 'New NetworkCredential("reasonable", "190854$")
+        'request.UseDefaultCredentials = True 'New NetworkCredential("reasonable", "190854$")
         '设置代理
         ' request.Proxy = New WebProxy("115.151.1.103:9999", True)
         request.ServicePoint.Expect100Continue = False ';//加快载入速度
@@ -662,8 +662,10 @@ Public Class Gather
         request.Timeout = 15000
         request.Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8"
         'request.Headers.Add("Accept-Encoding", "gzip, deflate, sdch")'导致请求回来的数据是乱码
-        request.Headers.Add("Accept-Language", "*")
-        request.UserAgent = "Mozilla/5.0 (compatible;MSIE 9.0;Windows NT 6.1;WOW64;Trident/5.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.65 Safari/537.36"
+        'request.Headers.Add(HttpRequestHeader.AcceptEncoding, "gzip,deflate") '定义gzip压缩页面支持
+        'request.ContentType = "application/x-www-form-urlencoded" '定义文档类型及编码
+        'request.Headers.Add("Accept-Language", "*")
+        request.UserAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36"
         request.Method = "GET"
         'request.Headers.Add("Cookie", Cookie)
         request.AllowAutoRedirect = True

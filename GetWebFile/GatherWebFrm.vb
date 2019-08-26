@@ -96,9 +96,13 @@ Public Class GatherWebFrm
     End Sub
 
     Private Sub startWork()
-        Dim encoding = System.Text.Encoding.UTF8
+        Dim encoding = "utf-8"
         If (cbo_encoding.Text.Equals("Default")) Then
-            encoding = System.Text.Encoding.Default
+            encoding = "Default"
+        ElseIf cbo_encoding.Text.Equals("Unicode") Then
+            encoding = "Unicode"
+        ElseIf cbo_encoding.Text.Equals("gb2312") Then
+            encoding = "gb2312"
         End If
 
         While waitList.Count > 0 AndAlso doingList.Count < threadMaxCount

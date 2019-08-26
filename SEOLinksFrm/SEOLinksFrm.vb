@@ -186,4 +186,14 @@ Public Class SEOLinksFrm
         txt_replace.Text = "Complete!"
         btn_addTag.Enabled = True
     End Sub
+
+    Private Sub btn_CreateFolder_Click(sender As Object, e As EventArgs) Handles btn_CreateFolder.Click
+        Dim filePath As String = txt_folderPath.Text.Trim()
+        For Each folderName As String In txt_replace.Text.Trim.Replace(vbCrLf, " ").Split(" ")
+            If Not Directory.Exists(Path.Combine(filePath, folderName)) Then
+                Directory.CreateDirectory(Path.Combine(filePath, folderName))
+            End If
+        Next
+        txt_replace.Text = "Complete!"
+    End Sub
 End Class
